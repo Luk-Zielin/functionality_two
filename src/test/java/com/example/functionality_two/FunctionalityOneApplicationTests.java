@@ -1,4 +1,4 @@
-package com.example.functionality_one;
+package com.example.functionality_two;
 
 import org.junit.jupiter.api.Test;
 import org.springframework.boot.test.context.SpringBootTest;

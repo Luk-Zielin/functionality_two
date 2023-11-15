@@ -1,11 +1,11 @@
-package com.example.functionality_one.controllers;
+package com.example.functionality_two.controllers;
 
-import com.example.functionality_one.DTOs.FileMetadataDTO;
-import com.example.functionality_one.repositories.MetadataJpaRepository;
-import com.example.functionality_one.services.MetadataService;
+import com.example.functionality_two.DTOs.FileMetadataDTO;
+import com.example.functionality_two.repositories.FoldersJpaRepository;
+import com.example.functionality_two.repositories.MetadataJpaRepository;
+import com.example.functionality_two.services.MetadataService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.MediaType;
-import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.*;
@@ -13,25 +13,28 @@ import org.springframework.web.bind.annotation.*;
 
 @Controller
 @RequestMapping("/files")
-
 public class MetadataController {
-    @Autowired
-    MetadataJpaRepository repository;
+    final
+    MetadataJpaRepository metadataRepository;
+    final
+    FoldersJpaRepository foldersRepository;
     MetadataService metadataService;
-    public MetadataController(){
-        metadataService = new MetadataService();
+    public MetadataController(FoldersJpaRepository foldersRepository, MetadataJpaRepository metadataRepository){
+        this.foldersRepository = foldersRepository;
+        this.metadataRepository = metadataRepository;
+        metadataService = new MetadataService(metadataRepository, foldersRepository);
     }
 
     @GetMapping("/{filename}")
     public String getFileMetadata(@PathVariable String filename, Model model){
         System.out.println("jestem 1"); //todo usuń
-        return metadataService.readFile(filename, repository, model);
+        return metadataService.readFile(filename, model);
     }
     @RequestMapping("/search")
     public String getFileMetadata(Model model, @RequestParam(value = "searchName",required = false) String name){
         System.out.println("jestem 1"); //todo usuń
         System.out.println(name);
-        return metadataService.readFile(name, repository, model);
+        return metadataService.readFile(name, model);
     }
     @RequestMapping
     public String startPage(){
@@ -40,7 +43,7 @@ public class MetadataController {
     @PostMapping(consumes = MediaType.APPLICATION_JSON_VALUE)
     public String postFile(@RequestBody FileMetadataDTO fileMetadataDTO, Model model) {
         System.out.println("jestem"); // todo usuń
-        return metadataService.createFile(fileMetadataDTO, repository, model);
+        return metadataService.createFile(fileMetadataDTO, model);
     }
     @PostMapping("/add/new")
     public String postFromMenu(Model model,@RequestParam(value = "filename",required = false) String name,
@@ -48,7 +51,7 @@ public class MetadataController {
                                @RequestParam(value = "folders",required = false) String folders){
         FileMetadataDTO fileMetadataDTO = new FileMetadataDTO(name, size, folders);
 
-        return metadataService.createFile(fileMetadataDTO, repository,model);
+        return metadataService.createFile(fileMetadataDTO, model);
     }
     @RequestMapping("/add")
     public String addPage(Model model){
@@ -56,11 +59,11 @@ public class MetadataController {
     }
     @PutMapping("/{filename}")
     public String putFile(@PathVariable String filename, @RequestBody FileMetadataDTO updatedFile, Model model) {
-        return metadataService.updateFile(filename, updatedFile, repository, model);
+        return metadataService.updateFile(filename, updatedFile, model);
     }
     @DeleteMapping("/{filename}")
     public String deleteFile(@PathVariable String filename, Model model) {
-        return metadataService.deleteFile(filename, repository, model);
+        return metadataService.deleteFile(filename, model);
     }
     @GetMapping("/delete")
     public String deleteMenu(){
@@ -69,7 +72,7 @@ public class MetadataController {
     @DeleteMapping("/delete")
     public String deleteFromMenu(Model model, @RequestParam(value = "searchName",required = false) String name){
         System.out.println("jestem delete");
-        return metadataService.deleteFile(name, repository, model);
+        return metadataService.deleteFile(name, model);
     }
     @GetMapping("/edit")
     public String editFile(){
@@ -80,6 +83,6 @@ public class MetadataController {
                                @RequestParam(value = "size",required = false) long size,
                                @RequestParam(value = "folders",required = false) String folders){
         FileMetadataDTO fileMetadataDTO = new FileMetadataDTO(name, size, folders);
-        return metadataService.updateFile(name, fileMetadataDTO, repository, model);
+        return metadataService.updateFile(name, fileMetadataDTO, model);
     }
 }

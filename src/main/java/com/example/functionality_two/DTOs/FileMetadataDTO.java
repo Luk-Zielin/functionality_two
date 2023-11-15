@@ -1,7 +1,7 @@
-package com.example.functionality_one.DTOs;
+package com.example.functionality_two.DTOs;
 
-import com.example.functionality_one.entities.FileMetadata;
-import org.springframework.http.HttpMessage;
+import com.example.functionality_two.entities.FileMetadata;
+import com.example.functionality_two.entities.Folder;
 
 public class FileMetadataDTO {
     private String filename;
@@ -17,7 +17,7 @@ public class FileMetadataDTO {
     public FileMetadataDTO(FileMetadata fileMetadata) {
         this.filename = fileMetadata.getFilename();
         this.size = fileMetadata.getSize()+" B";
-        this.folders = String.join(", ",fileMetadata.getFolders());
+        fileMetadata.getParentFolder().stream().map(Folder::toString).reduce("", String::concat);
     }
 
     public String getFilename() {
