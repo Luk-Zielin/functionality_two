@@ -1,5 +1,6 @@
 package com.example.functionality_two.entities;
 
+import com.example.functionality_two.DTOs.FolderDTO;
 import jakarta.persistence.*;
 
 import org.springframework.boot.autoconfigure.domain.EntityScan;
@@ -16,15 +17,45 @@ public class Folder implements FileType<Folder> {
 
     @ManyToMany
     @Column(nullable = true)
-    private List<Folder> parentFolder;
+    private List<Folder> parentFolders;
 
-    public Folder() {
+    @ManyToMany
+    @Column(nullable = true)
+    private List<Folder> childFolders;
+
+
+    public String getName() {
+        return name;
+    }
+
+    public void setName(String name) {
+        this.name = name;
+    }
+
+    public void setParentFolders(List<Folder> parentFolders) {
+        this.parentFolders = parentFolders;
+    }
+
+    public List<Folder> getChildFolders() {
+        return childFolders;
+    }
+
+    public void setChildFolders(List<Folder> childFolders) {
+        this.childFolders = childFolders;
+    }
+
+    public Folder(){
 
     }
 
-    @Override
-    public List<Folder> getParentFolder() {
-        return null;
+    public Folder(String name, List<Folder> parentFolders, List<Folder> childFolders) {
+        this.name = name;
+        this.parentFolders = parentFolders;
+        this.childFolders = childFolders;
+    }
+
+    public List<Folder> getParentFolders() {
+        return parentFolders;
     }
 
     public Folder(String name) {

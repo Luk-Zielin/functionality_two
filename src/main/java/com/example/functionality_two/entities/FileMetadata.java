@@ -18,9 +18,9 @@ public class FileMetadata implements FileType<Folder> {
 
     @ManyToMany
     @Column(nullable = true)
-    private List<Folder> parentFolder;
+    private List<Folder> parentFolders;
 
-    public FileMetadata(String filename, int size, List<Optional<Folder>> parentFolder) {
+    public FileMetadata(String filename, int size, List<Optional<Folder>> parentFolders) {
 
     }
 
@@ -52,18 +52,18 @@ public class FileMetadata implements FileType<Folder> {
         this.size = size;
     }
 
-    public List<Folder> getParentFolder() {
-        return parentFolder;
+    public List<Folder> getParentFolders() {
+        return parentFolders;
     }
 
-    public void setParentFolder(List<Folder> folder) {
-        this.parentFolder = folder;
+    public void setParentFolders(List<Folder> folder) {
+        this.parentFolders = folder;
     }
 
-    public FileMetadata(String filename, long size, List<Folder> parentFolder) {
+    public FileMetadata(String filename, long size, List<Folder> parentFolders) {
         this.filename = filename;
         this.size = size;
-        this.parentFolder = parentFolder;
+        this.parentFolders = parentFolders;
     }
 
 

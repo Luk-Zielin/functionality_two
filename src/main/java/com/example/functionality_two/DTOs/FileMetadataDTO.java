@@ -17,7 +17,7 @@ public class FileMetadataDTO {
     public FileMetadataDTO(FileMetadata fileMetadata) {
         this.filename = fileMetadata.getFilename();
         this.size = fileMetadata.getSize()+" B";
-        fileMetadata.getParentFolder().stream().map(Folder::toString).reduce("", String::concat);
+        fileMetadata.getParentFolders().stream().map(Folder::toString).reduce("", String::concat);
     }
 
     public String getFilename() {

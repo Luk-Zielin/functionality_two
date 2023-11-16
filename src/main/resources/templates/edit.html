@@ -7,7 +7,7 @@
 <body>
 <h2>Edit File Metadata</h2>
 
-<form th:action="@{/files/edit}" method="post">
+<form th:action="@{/files/edit}" th:method="put">
   <label for="filename">Filename:</label>
   <input type="text" id="filename" name="filename" required>
 

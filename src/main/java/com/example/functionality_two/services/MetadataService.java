@@ -52,7 +52,7 @@ public class MetadataService implements IMetadataService {
         }
         return metadataRepository.findByFilename(filename)
                 .map(fileMetadata -> {
-                    String string = fileMetadata.getParentFolder().stream().map(Folder::toString).reduce("", String::concat);
+                    String string = fileMetadata.getParentFolders().stream().map(Folder::toString).reduce("", String::concat);
                     FileMetadataDTO file = new FileMetadataDTO(
                             fileMetadata.getFilename(),
                             fileMetadata.getSize(),
@@ -74,7 +74,7 @@ public class MetadataService implements IMetadataService {
                             updatedFile.getFolders().split("(,)|(, )")) {
                         foldersRepository.findByName(folder).ifPresent(folders::add);
                     }
-                    existingFile.setParentFolder(folders);
+                    existingFile.setParentFolders(folders);
                     metadataRepository.save(existingFile);
                     model.addAttribute("file", existingFile);
                     return "redirect:/files";
