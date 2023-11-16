@@ -27,7 +27,7 @@ public class MetadataService implements IMetadataService {
     @Override
     public String createFile(FileMetadataDTO fileMetadataDTO, Model model) {
         if (fileMetadataDTO==null){
-            return "add";
+            return "files/add";
         }
         List<Folder> folders = new ArrayList<>();
         for (String folder :
@@ -48,18 +48,19 @@ public class MetadataService implements IMetadataService {
 
     public String readFile(String filename, Model model) {
         if(filename==null){
-            return "search";
+            return "files/search";
         }
         return metadataRepository.findByFilename(filename)
                 .map(fileMetadata -> {
-                    String string = fileMetadata.getParentFolders().stream().map(Folder::toString).reduce("", String::concat);
+                    String string = fileMetadata.getParentFolders().stream().map(Folder::toString).reduce((s1, s2) -> s1.isEmpty() ? s2 : s1 + ", " + s2)
+                            .orElse("");
                     FileMetadataDTO file = new FileMetadataDTO(
                             fileMetadata.getFilename(),
                             fileMetadata.getSize(),
                             string
                     );
                     model.addAttribute("file",file);
-                    return "get";
+                    return "files/get";
                 }).orElse("redirect:/files");
     }
 
@@ -79,18 +80,18 @@ public class MetadataService implements IMetadataService {
                     model.addAttribute("file", existingFile);
                     return "redirect:/files";
                 })
-                .orElse("edit");
+                .orElse("files/edit");
     }
 
     @Override
     public String deleteFile(String filename, Model model) {
         if(filename==null){
-            return "delete";
+            return "files/delete";
         }
         return metadataRepository.findByFilename(filename)
                 .map(existingFile -> {
                     metadataRepository.delete(existingFile);
-                    System.out.println("successfully deleted");
+
                     return "redirect:/files";
                 })
                 .orElse("redirect:/files");

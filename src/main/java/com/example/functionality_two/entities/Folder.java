@@ -1,6 +1,6 @@
 package com.example.functionality_two.entities;
 
-import com.example.functionality_two.DTOs.FolderDTO;
+
 import jakarta.persistence.*;
 
 import org.springframework.boot.autoconfigure.domain.EntityScan;
@@ -9,15 +9,13 @@ import java.util.List;
 
 @Entity
 @EntityScan("com.example.model")
-public class Folder implements FileType<Folder> {
+public class Folder {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private long id;
+    @Column(unique = true, nullable = false)
     private String name;
 
-    @ManyToMany
-    @Column(nullable = true)
-    private List<Folder> parentFolders;
 
     @ManyToMany
     @Column(nullable = true)
@@ -32,9 +30,6 @@ public class Folder implements FileType<Folder> {
         this.name = name;
     }
 
-    public void setParentFolders(List<Folder> parentFolders) {
-        this.parentFolders = parentFolders;
-    }
 
     public List<Folder> getChildFolders() {
         return childFolders;
@@ -48,15 +43,12 @@ public class Folder implements FileType<Folder> {
 
     }
 
-    public Folder(String name, List<Folder> parentFolders, List<Folder> childFolders) {
+    public Folder(String name, List<Folder> childFolders) {
         this.name = name;
-        this.parentFolders = parentFolders;
         this.childFolders = childFolders;
     }
 
-    public List<Folder> getParentFolders() {
-        return parentFolders;
-    }
+
 
     public Folder(String name) {
         this.name = name;

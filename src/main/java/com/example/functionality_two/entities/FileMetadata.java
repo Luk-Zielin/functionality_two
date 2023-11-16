@@ -8,7 +8,7 @@ import java.util.Optional;
 
 @Entity
 @EntityScan("com.example.model")
-public class FileMetadata implements FileType<Folder> {
+public class FileMetadata {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private long id;
@@ -20,9 +20,6 @@ public class FileMetadata implements FileType<Folder> {
     @Column(nullable = true)
     private List<Folder> parentFolders;
 
-    public FileMetadata(String filename, int size, List<Optional<Folder>> parentFolders) {
-
-    }
 
     public FileMetadata() {
 
