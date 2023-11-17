@@ -5,6 +5,7 @@ import com.example.functionality_two.repositories.FoldersJpaRepository;
 import com.example.functionality_two.repositories.MetadataJpaRepository;
 import com.example.functionality_two.services.MetadataService;
 import org.springframework.http.MediaType;
+import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.*;
@@ -25,8 +26,8 @@ public class MetadataController {
     }
 
     @GetMapping("/{filename}")
-    public String getFileMetadata(@PathVariable String filename, Model model){
-        return metadataService.readFile(filename, model);
+    public ResponseEntity<FileMetadataDTO> getFileMetadata(@PathVariable String filename){
+        return metadataService.readFile(filename);
     }
     @RequestMapping("/search")
     public String getFileMetadata(Model model, @RequestParam(value = "searchName",required = false) String name){
@@ -37,8 +38,8 @@ public class MetadataController {
         return "files/filesmenu";
     }
     @PostMapping(consumes = MediaType.APPLICATION_JSON_VALUE)
-    public String postFile(@RequestBody FileMetadataDTO fileMetadataDTO, Model model) {
-        return metadataService.createFile(fileMetadataDTO, model);
+    public ResponseEntity<FileMetadataDTO> postFile(@RequestBody FileMetadataDTO fileMetadataDTO) {
+        return metadataService.createFile(fileMetadataDTO);
     }
     @PostMapping("/add/new")
     public String postFromMenu(Model model,@RequestParam(value = "filename",required = false) String name,
@@ -53,8 +54,8 @@ public class MetadataController {
         return "files/add";
     }
     @PutMapping("/{filename}")
-    public String putFile(@PathVariable String filename, @RequestBody FileMetadataDTO updatedFile, Model model) {
-        return metadataService.updateFile(filename, updatedFile, model);
+    public ResponseEntity<FileMetadataDTO> putFile(@PathVariable String filename, @RequestBody FileMetadataDTO updatedFile) {
+        return metadataService.updateFile(filename, updatedFile);
     }
     @DeleteMapping("/{filename}")
     public String deleteFile(@PathVariable String filename, Model model) {

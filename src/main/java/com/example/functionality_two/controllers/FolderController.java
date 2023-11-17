@@ -4,7 +4,9 @@ import com.example.functionality_two.DTOs.FolderDTO;
 import com.example.functionality_two.repositories.FoldersJpaRepository;
 import com.example.functionality_two.repositories.MetadataJpaRepository;
 import com.example.functionality_two.services.FoldersService;
+
 import org.springframework.http.MediaType;
+import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.*;
@@ -28,9 +30,9 @@ public class FolderController {
     }
 
     @GetMapping("/{folderName}")
-    public String getFileMetadata(@PathVariable String folderName, Model model){
+    public ResponseEntity<FolderDTO> getFileMetadata(@PathVariable String folderName){
 
-        return foldersService.readFolder(folderName, model);
+        return foldersService.readFolder(folderName);
     }
     @RequestMapping("/search")
     public String getFileMetadata(Model model, @RequestParam(value = "searchName",required = false) String name){
@@ -42,8 +44,8 @@ public class FolderController {
         return "folders/foldersmenu";
     }
     @PostMapping(consumes = MediaType.APPLICATION_JSON_VALUE)
-    public String postFile(@RequestBody FolderDTO folderDTO, Model model) {
-        return foldersService.createFolder(folderDTO, model);
+    public ResponseEntity<FolderDTO> postFile(@RequestBody FolderDTO folderDTO) {
+        return foldersService.createFolder(folderDTO);
     }
     @PostMapping("/add/new")
     public String postFromMenu(Model model,@RequestParam(value = "foldername",required = false) String name,
@@ -60,16 +62,16 @@ public class FolderController {
         return "folders/add";
     }
     @PutMapping("/{folderName}")
-    public String putFolder(@PathVariable String folderName, @RequestBody FolderDTO updatedFolder, Model model) {
-        return foldersService.updateFolder(folderName, updatedFolder, model);
+    public ResponseEntity<FolderDTO> putFolder(@PathVariable String folderName, @RequestBody FolderDTO updatedFolder) {
+        return foldersService.updateFolder(folderName, updatedFolder);
     }
     @DeleteMapping("/{folderName}")
     public String deleteFolder(@PathVariable String folderName, Model model) {
         return foldersService.deleteFolder(folderName, model);
     }
     @PostMapping()
-    public String postFolder(@RequestBody FolderDTO newFolder, Model model){
-        return foldersService.createFolder(newFolder, model);
+    public ResponseEntity<FolderDTO> postFolder(@RequestBody FolderDTO newFolder){
+        return foldersService.createFolder(newFolder);
     }
     @GetMapping("/delete")
     public String deleteMenu(){
@@ -90,4 +92,5 @@ public class FolderController {
         FolderDTO folderDTO = new FolderDTO(name, childList);
         return foldersService.updateFolder(name, folderDTO, model);
     }
+
 }

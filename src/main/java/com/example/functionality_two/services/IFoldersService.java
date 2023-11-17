@@ -1,6 +1,7 @@
 package com.example.functionality_two.services;
 
 import com.example.functionality_two.DTOs.FolderDTO;
+import org.springframework.http.ResponseEntity;
 import org.springframework.ui.Model;
 
 public interface IFoldersService {
@@ -8,4 +9,8 @@ public interface IFoldersService {
     String deleteFolder(String folderName, Model model);
     String readFolder(String folderName, Model model);
     String updateFolder(String folderName, FolderDTO updatedFolder, Model model);
+
+    ResponseEntity<FolderDTO> updateFolder(String folderName, FolderDTO updatedFolder);
+
+    ResponseEntity<FolderDTO> createFolder(FolderDTO newFolder);
 }

@@ -7,6 +7,7 @@ import com.example.functionality_two.repositories.FoldersJpaRepository;
 import com.example.functionality_two.repositories.MetadataJpaRepository;
 
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
 import org.springframework.ui.Model;
 
@@ -62,6 +63,62 @@ public class MetadataService implements IMetadataService {
                     model.addAttribute("file",file);
                     return "files/get";
                 }).orElse("redirect:/files");
+    }
+    public ResponseEntity<FileMetadataDTO> readFile(String filename) {
+        if(filename==null){
+            return ResponseEntity.badRequest().build();
+        }
+        return metadataRepository.findByFilename(filename)
+                .map(fileMetadata -> {
+                    String string = fileMetadata.getParentFolders().stream().map(Folder::toString).reduce((s1, s2) -> s1.isEmpty() ? s2 : s1 + ", " + s2)
+                            .orElse("");
+                    FileMetadataDTO file = new FileMetadataDTO(
+                            fileMetadata.getFilename(),
+                            fileMetadata.getSize(),
+                            string
+                    );
+
+                    return ResponseEntity.ok().body(file);
+                }).orElse(ResponseEntity.notFound().build());
+    }
+
+    @Override
+    public ResponseEntity<FileMetadataDTO> createFile(FileMetadataDTO fileMetadataDTO) {
+        if (fileMetadataDTO==null){
+            return ResponseEntity.badRequest().build();
+        }
+        List<Folder> folders = new ArrayList<>();
+        for (String folder :
+                fileMetadataDTO.getFolders().split("(,)|(, )")) {
+            foldersRepository.findByName(folder).ifPresent(folders::add);
+        }
+        FileMetadata fileMetadata = new FileMetadata(fileMetadataDTO.getFilename(),
+                Integer.parseInt(fileMetadataDTO.getSize().split(" ")[0]),
+                folders
+        );
+        if (metadataRepository.findByFilename(fileMetadata.getFilename()).isPresent()) {
+            return readFile(fileMetadata.getFilename());
+        }
+        FileMetadata savedFile = metadataRepository.save(fileMetadata);
+        return readFile(savedFile.getFilename());
+    }
+
+    @Override
+    public ResponseEntity<FileMetadataDTO> updateFile(String filename, FileMetadataDTO updatedFile) {
+        return metadataRepository.findByFilename(filename)
+                .map(existingFile -> {
+                    existingFile.setSize(Integer.parseInt(updatedFile.getSize().split(" ")[0]));
+                    List<Folder> folders = new ArrayList<>();
+
+                    for (String folder:
+                            updatedFile.getFolders().split("(,)|(, )")) {
+                        foldersRepository.findByName(folder).ifPresent(folders::add);
+                    }
+                    existingFile.setParentFolders(folders);
+                    metadataRepository.save(existingFile);
+                    return ResponseEntity.ok(updatedFile);
+                })
+                .orElse(ResponseEntity.notFound().build());
     }
 
     @Override

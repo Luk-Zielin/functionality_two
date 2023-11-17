@@ -5,6 +5,7 @@ import com.example.functionality_two.entities.Folder;
 import com.example.functionality_two.repositories.FoldersJpaRepository;
 import com.example.functionality_two.repositories.MetadataJpaRepository;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
 import org.springframework.ui.Model;
 
@@ -77,6 +78,21 @@ public class FoldersService implements IFoldersService{
                     return "folders/get";
                 }).orElse("redirect:/folders");
     }
+    public ResponseEntity<FolderDTO> readFolder(String folderName) {
+        if(folderName==null){
+            return ResponseEntity.badRequest().build();
+        }
+        return foldersRepository.findByName(folderName)
+                .map(folder -> {
+                    List<String> childFolders = folder.getChildFolders().stream().map(Folder::toString).toList();
+                    FolderDTO folderToAdd = new FolderDTO(
+                            folder.getName(),
+                            childFolders
+                    );
+
+                    return ResponseEntity.ok().body(folderToAdd);
+                }).orElse(ResponseEntity.notFound().build());
+    }
 
     @Override
     public String updateFolder(String folderName, FolderDTO updatedFolder, Model model) {
@@ -93,5 +109,44 @@ public class FoldersService implements IFoldersService{
                     return "redirect:/folders";
                 })
                 .orElse("folders/edit");
+    }
+
+    @Override
+    public ResponseEntity<FolderDTO> updateFolder(String folderName, FolderDTO updatedFolder) {
+        return foldersRepository.findByName(folderName)
+                .map(existingFolder -> {
+                    List<Folder> childFolders = new ArrayList<>();
+                    for (String folder:
+                            updatedFolder.getChildFolders()) {
+                        foldersRepository.findByName(folder).ifPresent(childFolders::add);
+                    }
+                    existingFolder.setChildFolders(childFolders);
+                    foldersRepository.save(existingFolder);
+                    return ResponseEntity.ok(updatedFolder);
+                })
+                .orElse(ResponseEntity.notFound().build());
+    }
+
+    @Override
+    public ResponseEntity<FolderDTO> createFolder(FolderDTO newFolder) {
+        if (newFolder==null){
+            return ResponseEntity.badRequest().build();
+        }
+        List<Folder> childFolders = new ArrayList<>();
+        for (String folder :
+                newFolder.getChildFolders()){
+            foldersRepository.findByName(folder).ifPresent(childFolders::add);
+        }
+
+        Folder folder = new Folder(newFolder.getName(),
+                childFolders
+        );
+        if (foldersRepository.findByName(folder.getName()).isPresent()) {
+
+            return readFolder(folder.getName());
+        }
+
+        Folder savedFolder = foldersRepository.save(folder);
+        return readFolder(savedFolder.getName());
     }
 }
